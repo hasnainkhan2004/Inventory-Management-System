@@ -1,0 +1,60 @@
+{% extends 'inventory/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1 class="mb-4">📦 Inventory Dashboard</h1>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Total Products</h5>
+                <h2>{{ total_products }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Total Stock Value</h5>
+                <h2>Rs {{ total_stock_value }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <h5 class="card-title">Low Stock Items</h5>
+                <h2>{{ low_stock_count }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-danger text-white">⚠️ Low Stock Alert</div>
+    <table class="table mb-0">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>SKU</th>
+                <th>Current Quantity</th>
+                <th>Threshold</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in low_stock_products %}
+            <tr class="table-warning">
+                <td>{{ product.name }}</td>
+                <td>{{ product.sku }}</td>
+                <td>{{ product.quantity }}</td>
+                <td>{{ product.low_stock_threshold }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center py-3">No low stock items. All good! ✅</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<a href="/admin/" class="btn btn-secondary mt-4">Go to Admin Panel</a>
+{% endblock %}

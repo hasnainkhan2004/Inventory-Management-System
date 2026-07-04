@@ -1,0 +1,24 @@
+{% extends 'inventory/base.html' %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-center">
+    <div class="card p-4" style="width: 350px;">
+        <h3 class="mb-3 text-center">Inventory Login</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label>Username</label>
+                {{ form.username }}
+            </div>
+            <div class="mb-3">
+                <label>Password</label>
+                {{ form.password }}
+            </div>
+            {% if form.errors %}
+                <p class="text-danger">Invalid username or password.</p>
+            {% endif %}
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
