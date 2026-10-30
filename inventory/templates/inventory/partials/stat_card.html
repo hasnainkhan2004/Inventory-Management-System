@@ -1,0 +1,20 @@
+<article class="stat-card">
+    <div class="stat-card-top">
+        <span class="stat-icon stat-icon-{{ icon }}">
+            {% if icon == 'products' %}
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5"/></svg>
+            {% elif icon == 'value' %}
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20m5-16H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            {% else %}
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.8 19h18.4L12 3Z"/><path d="M12 9v4m0 3h.01"/></svg>
+            {% endif %}
+        </span>
+        <span class="stat-trend{% if trend_tone %} trend-{{ trend_tone }}{% endif %}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 15 6-6 4 4 5-6m-5 0h5v5"/></svg>
+            {{ trend }}
+        </span>
+    </div>
+    <p class="stat-label">{{ label }}</p>
+    <strong class="stat-value">{% if prefix %}{{ prefix }} {% endif %}{{ value }}</strong>
+    <p class="stat-detail">{{ detail }}</p>
+</article>

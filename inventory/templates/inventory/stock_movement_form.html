@@ -1,0 +1,33 @@
+{% extends 'inventory/base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+{% include 'inventory/partials/page_header.html' with eyebrow='Inventory' title=title subtitle='Record a stock change with its reason and reference.' %}
+<section class="panel form-panel">
+    <form method="post" class="styled-form" data-stock-movement-form>
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+        <div class="form-grid">
+            {% for field in form.visible_fields %}
+                <div class="form-field{% if field.errors %} has-error{% endif %}">
+                    {% if field.name == 'product' %}
+                        <label for="product-filter">Find product</label>
+                        <input id="product-filter" class="form-control" type="search" placeholder="Type a product name..." autocomplete="off" data-product-filter>
+                        {{ field.label_tag }}
+                        {{ field }}
+                        <small class="field-help" data-current-stock-display>Select a product to see its current stock.</small>
+                    {% else %}
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}<small class="field-help">{{ field.help_text }}</small>{% endif %}
+                    {% endif %}
+                    {% if field.errors %}<div class="field-errors">{{ field.errors }}</div>{% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="form-actions">
+            <a class="button button-secondary" href="{% url 'stock_movement_list' %}">Cancel</a>
+            <button type="submit" class="button button-primary">Record movement</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

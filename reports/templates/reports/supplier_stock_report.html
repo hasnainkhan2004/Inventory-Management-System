@@ -1,0 +1,20 @@
+{% extends 'inventory/base.html' %}
+{% load report_formatting %}
+{% block title %}Supplier-wise Stock Report{% endblock %}
+{% block content %}
+<div class="page-header report-page-header"><div><p class="eyebrow">Reports</p><h1>Supplier-wise Stock</h1><p class="page-subtitle">Inventory quantities, cost value, and low-stock exposure by supplier.</p></div><a class="button button-secondary" href="?export=csv">Export CSV</a></div>
+<section class="stats-grid report-stats">
+    {% include 'inventory/partials/stat_card.html' with label='Suppliers' value=totals.supplier_count detail='Supplier records' icon='products' trend='Partners' trend_tone='neutral' %}
+    {% include 'inventory/partials/stat_card.html' with label='Products' value=totals.product_count detail='Assigned to suppliers' icon='value' trend='Catalog' trend_tone='neutral' %}
+    {% include 'inventory/partials/stat_card.html' with label='Total units' value=totals.total_units detail='Across supplier products' icon='products' trend='Units' trend_tone='neutral' %}
+    {% include 'inventory/partials/stat_card.html' with label='Low stock items' value=totals.low_stock_count detail='Products at or below threshold' icon='warning' trend='Review' trend_tone='warning' %}
+    {% include 'inventory/partials/stat_card.html' with label='Total cost value' value=totals.total_cost_value|currency detail='Stock at cost prices' icon='value' trend='Cost' trend_tone='neutral' %}
+</section>
+<section class="panel product-panel report-table-panel">
+    <div class="report-table-heading"><div><h2>Supplier summary</h2><span>{{ page_obj.paginator.count }} suppliers</span></div></div>
+    <div class="table-scroll"><table class="data-table"><thead><tr><th>Supplier</th><th>Product count</th><th>Total units</th><th>Total cost value</th><th>Low stock items</th></tr></thead><tbody>
+        {% for supplier in suppliers %}<tr class="clickable-report-row" data-href="{% url 'supplier_detail' supplier.pk %}"><td><a class="table-primary" href="{% url 'supplier_detail' supplier.pk %}">{{ supplier.name }}</a></td><td>{{ supplier.product_count }}</td><td>{{ supplier.total_units }}</td><td>{{ supplier.total_cost_value|currency }}</td><td>{{ supplier.low_stock_count }}</td></tr>{% empty %}<tr><td colspan="5"><div class="empty-state"><strong>No suppliers yet</strong><p>Add suppliers to see supplier-wise stock totals.</p><a class="button button-primary" href="{% url 'supplier_add' %}">Add supplier</a></div></td></tr>{% endfor %}
+    </tbody></table></div>
+    {% include 'reports/partials/pagination.html' %}
+</section>
+{% endblock %}

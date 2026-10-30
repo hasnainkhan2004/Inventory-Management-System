@@ -1,0 +1,25 @@
+{% extends 'inventory/base.html' %}
+{% block title %}Delete supplier{% endblock %}
+{% block content %}
+<div class="modal-backdrop">
+    <section class="confirmation-modal" role="alertdialog" aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-description">
+        <span class="modal-warning-icon">!</span>
+        {% if has_products %}
+            <h1 id="delete-title">Supplier has assigned products</h1>
+            <p id="delete-description"><strong>{{ supplier.name }}</strong> cannot be deleted while products are assigned. Mark this supplier inactive instead.</p>
+            <div class="modal-actions">
+                <a class="button button-secondary" href="{% url 'supplier_detail' supplier.pk %}">Back to supplier</a>
+                <a class="button button-primary" href="{% url 'supplier_edit' supplier.pk %}">Mark inactive</a>
+            </div>
+        {% else %}
+            <h1 id="delete-title">Delete this supplier?</h1>
+            <p id="delete-description">You’re about to permanently delete <strong>{{ supplier.name }}</strong>. This action can’t be undone.</p>
+            <form method="post" class="modal-actions">
+                {% csrf_token %}
+                <a class="button button-secondary" href="{% url 'supplier_detail' supplier.pk %}">Cancel</a>
+                <button type="submit" class="button button-danger">Delete supplier</button>
+            </form>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

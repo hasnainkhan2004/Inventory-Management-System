@@ -1,0 +1,58 @@
+{% extends 'inventory/base.html' %}
+{% block title %}Suppliers{% endblock %}
+{% block content %}
+{% url 'supplier_add' as supplier_add_url %}
+{% include 'inventory/partials/page_header.html' with eyebrow='Partners' title='Suppliers' subtitle='Manage your suppliers and the products they provide.' action_url=supplier_add_url action_label='Add supplier' %}
+<section class="panel product-panel">
+    <form method="get" class="table-toolbar">
+        <div class="table-toolbar-copy">
+            <strong>Supplier directory</strong>
+            <span>{{ page_obj.paginator.count }} suppliers</span>
+        </div>
+        <div class="table-search">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg>
+            <input type="search" name="q" value="{{ query }}" placeholder="Search name, phone, or city..." aria-label="Search suppliers">
+        </div>
+        <select class="filter-select" name="status" aria-label="Filter by status">
+            <option value="">All statuses</option>
+            <option value="active"{% if status_filter == 'active' %} selected{% endif %}>Active</option>
+            <option value="inactive"{% if status_filter == 'inactive' %} selected{% endif %}>Inactive</option>
+        </select>
+        <button class="button button-secondary" type="submit">Apply filters</button>
+        {% if query or status_filter %}<a class="clear-search" href="{% url 'supplier_list' %}">Clear</a>{% endif %}
+    </form>
+    <div class="table-scroll">
+        <table class="data-table">
+            <thead><tr><th>Name</th><th>Contact person</th><th>Phone</th><th>City</th><th>Products</th><th>Payment terms</th><th>Status</th><th class="actions-heading">Actions</th></tr></thead>
+            <tbody>
+                {% for supplier in suppliers %}
+                    <tr>
+                        <td><a class="table-primary" href="{% url 'supplier_detail' supplier.pk %}">{{ supplier.name }}</a></td>
+                        <td>{{ supplier.contact_person|default:'—' }}</td>
+                        <td>{{ supplier.phone|default:'—' }}</td>
+                        <td>{{ supplier.city|default:'—' }}</td>
+                        <td>{{ supplier.product_count }}</td>
+                        <td>{{ supplier.payment_terms }}</td>
+                        <td>{% if supplier.is_active %}{% include 'inventory/partials/status_badge.html' with label='Active' tone='success' %}{% else %}{% include 'inventory/partials/status_badge.html' with label='Inactive' tone='neutral' %}{% endif %}</td>
+                        <td class="table-actions">
+                            <a class="button button-small button-quiet" href="{% url 'supplier_edit' supplier.pk %}">Edit</a>
+                            {% if user.is_staff %}<a class="button button-small button-danger-quiet" href="{% url 'supplier_delete' supplier.pk %}">Delete</a>{% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="8"><div class="empty-state"><span class="empty-icon">◇</span><strong>{% if query or status_filter %}No matching suppliers{% else %}No suppliers yet{% endif %}</strong><p>{% if query or status_filter %}Try changing or clearing the filters.{% else %}Add a supplier to connect your products with their vendors.{% endif %}</p>{% if not query and not status_filter %}<a class="button button-primary" href="{% url 'supplier_add' %}">Add your first supplier</a>{% endif %}</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if page_obj.paginator.num_pages > 1 %}
+        <nav class="pagination-bar" aria-label="Supplier pages">
+            <span>Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            <div class="pagination-controls">
+                {% if page_obj.has_previous %}<a class="button button-secondary button-small" href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>{% else %}<span class="button button-secondary button-small is-disabled">Previous</span>{% endif %}
+                {% if page_obj.has_next %}<a class="button button-secondary button-small" href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}">Next</a>{% else %}<span class="button button-secondary button-small is-disabled">Next</span>{% endif %}
+            </div>
+        </nav>
+    {% endif %}
+</section>
+{% endblock %}

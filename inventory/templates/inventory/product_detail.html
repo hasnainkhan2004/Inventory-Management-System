@@ -1,0 +1,62 @@
+{% extends 'inventory/base.html' %}
+{% block title %}{{ product.name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Product details</p>
+        <h1>{{ product.name }}</h1>
+        <p class="page-subtitle">{{ product.sku }}{% if product.category %} · {{ product.category.name }}{% endif %}</p>
+    </div>
+    <div class="header-actions">
+        <a class="button button-secondary" href="{% url 'product_edit' product.pk %}">Edit product</a>
+        <a class="button button-primary" href="{% url 'stock_in' %}?product={{ product.pk }}">Stock In</a>
+        <a class="button button-secondary" href="{% url 'stock_out' %}?product={{ product.pk }}">Stock Out</a>
+        <a class="button button-secondary" href="{% url 'stock_adjust' %}?product={{ product.pk }}">Adjust stock</a>
+        {% if user.is_staff %}<a class="button button-danger-quiet" href="{% url 'product_delete' product.pk %}">Delete product</a>{% endif %}
+    </div>
+</div>
+<section class="product-detail-grid">
+    <article class="panel product-overview">
+        {% if product.image %}<img class="product-detail-image" src="{{ product.image.url }}" alt="{{ product.name }}">{% else %}<div class="product-detail-placeholder">{{ product.name|first|upper }}</div>{% endif %}
+        <div class="product-detail-info">
+            <span class="eyebrow">Current stock</span>
+            <strong class="product-detail-quantity">{{ product.quantity }} <small>{{ product.unit.short_code|default:'units' }}</small></strong>
+            {% if product.is_low_stock %}{% include 'inventory/partials/status_badge.html' with label='Low stock' tone='warning' %}{% else %}{% include 'inventory/partials/status_badge.html' with label='In stock' tone='success' %}{% endif %}
+        </div>
+        <dl class="product-facts">
+            <div><dt>Category</dt><dd>{{ product.category.name|default:'Uncategorized' }}</dd></div>
+            <div><dt>Unit</dt><dd>{{ product.unit.name|default:'—' }}</dd></div>
+            <div><dt>Supplier</dt><dd>{% if product.supplier %}<a href="{% url 'supplier_detail' product.supplier_id %}">{{ product.supplier.name }}</a>{% else %}—{% endif %}</dd></div>
+            <div><dt>Cost price</dt><dd>Rs {{ product.cost_price }}</dd></div>
+            <div><dt>Selling price</dt><dd>Rs {{ product.selling_price }}</dd></div>
+            <div><dt>Minimum stock</dt><dd>{{ product.low_stock_threshold }}</dd></div>
+        </dl>
+        {% if product.description %}<p class="product-description">{{ product.description }}</p>{% endif %}
+    </article>
+    <article class="panel inventory-panel product-history">
+        <div class="panel-heading inventory-heading">
+            <div><h2>Movement history</h2><p>Complete stock ledger for this product</p></div>
+            <span class="chart-period">{{ movements|length }} entries</span>
+        </div>
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr><th>Date</th><th>Type</th><th>Change</th><th>Before → After</th><th>Reason</th><th>User</th></tr></thead>
+                <tbody>
+                    {% for movement in movements %}
+                        <tr>
+                            <td>{{ movement.created_at|date:'M j, Y H:i' }}</td>
+                            <td><span class="movement-pill movement-{{ movement.movement_type|lower }}">{{ movement.get_movement_type_display }}</span></td>
+                            <td class="{% if movement.quantity_change > 0 %}movement-positive{% else %}movement-negative{% endif %}">{% if movement.quantity_change > 0 %}+{% endif %}{{ movement.quantity_change }}</td>
+                            <td>{{ movement.quantity_before }} → {{ movement.quantity_after }}</td>
+                            <td>{{ movement.reason }}</td>
+                            <td>{{ movement.created_by.get_username }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="6"><div class="empty-state"><span class="empty-icon">↔</span><strong>No movement history</strong><p>New stock changes for this product will appear here.</p></div></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+</section>
+{% endblock %}

@@ -1,60 +1,118 @@
 {% extends 'inventory/base.html' %}
 {% block title %}Dashboard{% endblock %}
+{% block extra_head %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js" defer></script>{% endblock %}
 {% block content %}
-<h1 class="mb-4">📦 Inventory Dashboard</h1>
+{% include 'inventory/partials/page_header.html' with eyebrow='Overview' title='Dashboard' subtitle='Here’s what’s happening with your inventory today.' %}
 
-<div class="row mb-4">
-    <div class="col-md-4">
-        <div class="card text-white bg-primary">
-            <div class="card-body">
-                <h5 class="card-title">Total Products</h5>
-                <h2>{{ total_products }}</h2>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card text-white bg-success">
-            <div class="card-body">
-                <h5 class="card-title">Total Stock Value</h5>
-                <h2>Rs {{ total_stock_value }}</h2>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card text-white bg-danger">
-            <div class="card-body">
-                <h5 class="card-title">Low Stock Items</h5>
-                <h2>{{ low_stock_count }}</h2>
-            </div>
-        </div>
-    </div>
-</div>
+<section class="stats-grid" aria-label="Inventory summary">
+    {% include 'inventory/partials/stat_card.html' with label='Total products' value=total_products detail='Products in your catalog' icon='products' trend='Catalog' trend_tone='neutral' %}
+    {% include 'inventory/partials/stat_card.html' with label='Total stock value' prefix='Rs' value=total_stock_value detail='Current inventory valuation' icon='value' trend='Live value' trend_tone='neutral' %}
+    {% include 'inventory/partials/stat_card.html' with label='Low stock items' value=low_stock_count detail='Need attention soon' icon='warning' trend='Review' trend_tone='warning' %}
+    {% include 'inventory/partials/stat_card.html' with label='Stock in / out this week' value=weekly_stock_summary detail='Units received / issued since Monday' icon='products' trend='This week' trend_tone='neutral' %}
+</section>
 
-<div class="card">
-    <div class="card-header bg-danger text-white">⚠️ Low Stock Alert</div>
-    <table class="table mb-0">
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th>SKU</th>
-                <th>Current Quantity</th>
-                <th>Threshold</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for product in low_stock_products %}
-            <tr class="table-warning">
-                <td>{{ product.name }}</td>
-                <td>{{ product.sku }}</td>
-                <td>{{ product.quantity }}</td>
-                <td>{{ product.low_stock_threshold }}</td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="4" class="text-center py-3">No low stock items. All good! ✅</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+<section class="chart-grid" aria-label="Inventory charts">
+    <article class="panel chart-panel">
+        <div class="panel-heading">
+            <div><h2>Stock by category</h2><p>Current units across categories</p></div>
+            <span class="chart-period">This month <span aria-hidden="true">⌄</span></span>
+        </div>
+        <div class="chart-canvas-wrap chart-doughnut-wrap">
+            {% if stock_by_category %}
+                <canvas id="category-stock-chart" aria-label="Doughnut chart showing stock by category" role="img"></canvas>
+            {% else %}
+                <div class="chart-empty">Add products with stock to see category totals here.</div>
+            {% endif %}
+        </div>
+        <p class="chart-note">Live inventory units · grouped by product category</p>
+    </article>
+    <article class="panel chart-panel">
+        <div class="panel-heading">
+            <div><h2>Stock value over time</h2><p>Estimated inventory value</p></div>
+            <span class="chart-period">Last 6 months <span aria-hidden="true">⌄</span></span>
+        </div>
+        <div class="chart-canvas-wrap"><canvas id="stock-value-chart" aria-label="Line chart showing stock value over time" role="img"></canvas></div>
+        <p class="chart-note">Sample visualization · Historical valuation is not yet tracked</p>
+    </article>
+</section>
 
-<a href="/admin/" class="btn btn-secondary mt-4">Go to Admin Panel</a>
+<section class="panel inventory-panel recent-movements-panel">
+    <div class="panel-heading inventory-heading">
+        <div><h2>Recent movements</h2><p>The latest changes to inventory</p></div>
+        <a class="text-link" href="{% url 'stock_movement_list' %}">View all movements <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="table-scroll">
+        <table class="data-table">
+            <thead>
+                <tr><th>Date</th><th>Product</th><th>Type</th><th>Change</th><th>Before → After</th><th>User</th></tr>
+            </thead>
+            <tbody>
+                {% for movement in recent_movements %}
+                    <tr>
+                        <td>{{ movement.created_at|date:'M j, Y H:i' }}</td>
+                        <td><a class="table-primary" href="{% url 'product_detail' movement.product_id %}">{{ movement.product.name }}</a></td>
+                        <td><span class="movement-pill movement-{{ movement.movement_type|lower }}">{{ movement.get_movement_type_display }}</span></td>
+                        <td class="{% if movement.quantity_change > 0 %}movement-positive{% else %}movement-negative{% endif %}">{% if movement.quantity_change > 0 %}+{% endif %}{{ movement.quantity_change }}</td>
+                        <td>{{ movement.quantity_before }} → {{ movement.quantity_after }}</td>
+                        <td>{{ movement.created_by.get_username }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="6"><div class="empty-state"><span class="empty-icon">↔</span><strong>No stock movements yet</strong><p>Stock changes will appear here as you record them.</p><a class="button button-primary" href="{% url 'stock_in' %}">Record stock in</a></div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="panel inventory-panel">
+    <div class="panel-heading inventory-heading">
+        <div><h2>Low stock watchlist</h2><p>Products below their minimum threshold</p></div>
+        <a class="text-link" href="{% url 'product_list' %}">View all products <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="table-scroll">
+        <table class="data-table">
+            <thead>
+                <tr><th>Product</th><th>SKU</th><th>Supplier</th><th>Available</th><th>Minimum</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                {% for product in low_stock_products %}
+                    <tr>
+                        <td><strong class="table-primary">{{ product.name }}</strong></td>
+                        <td><span class="table-mono">{{ product.sku }}</span></td>
+                        <td>{% if product.supplier %}<a href="{% url 'supplier_detail' product.supplier_id %}">{{ product.supplier.name }}</a>{% else %}<span class="text-faint">—</span>{% endif %}</td>
+                        <td>{{ product.quantity }} units</td>
+                        <td>{{ product.low_stock_threshold }} units</td>
+                        <td>{% include 'inventory/partials/status_badge.html' with label='Low stock' tone='warning' %}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="6"><div class="empty-state"><span class="empty-icon">✓</span><strong>All stocked up</strong><p>No products are currently below their threshold.</p></div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="panel inventory-panel top-suppliers-panel">
+    <div class="panel-heading inventory-heading">
+        <div><h2>Top suppliers by stock value</h2><p>Current inventory value at selling prices</p></div>
+        <a class="text-link" href="{% url 'supplier_list' %}">View suppliers <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="table-scroll">
+        <table class="data-table">
+            <thead><tr><th>Supplier</th><th>Products</th><th>Stock value</th></tr></thead>
+            <tbody>
+                {% for supplier in top_suppliers %}
+                    <tr>
+                        <td><a class="table-primary" href="{% url 'supplier_detail' supplier.pk %}">{{ supplier.name }}</a></td>
+                        <td>{{ supplier.product_count }}</td>
+                        <td>Rs {{ supplier.stock_value|default:0 }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="3"><div class="empty-state"><strong>No supplier stock yet</strong><p>Assign products to suppliers to see stock value totals.</p></div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{{ stock_by_category|json_script:"stock-by-category-data" }}
 {% endblock %}

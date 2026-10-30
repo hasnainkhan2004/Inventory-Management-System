@@ -1,0 +1,36 @@
+{% extends 'inventory/base.html' %}
+{% block title %}Categories{% endblock %}
+{% block content %}
+{% url 'category_add' as category_add_url %}
+{% include 'inventory/partials/page_header.html' with eyebrow='Catalog' title='Categories' subtitle='Group products to keep your inventory organized.' action_url=category_add_url action_label='Add category' %}
+<section class="panel product-panel">
+    <div class="table-toolbar">
+        <div class="table-toolbar-copy">
+            <strong>Product categories</strong>
+            <span>{{ categories|length }} categories</span>
+        </div>
+    </div>
+    <div class="table-scroll">
+        <table class="data-table">
+            <thead>
+                <tr><th>Category</th><th>Description</th><th>Products</th><th class="actions-heading">Actions</th></tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                    <tr>
+                        <td><strong class="table-primary">{{ category.name }}</strong></td>
+                        <td>{{ category.description|default:'—'|truncatechars:90 }}</td>
+                        <td>{{ category.product_count }}</td>
+                        <td class="table-actions">
+                            <a class="button button-small button-quiet" href="{% url 'category_edit' category.pk %}">Edit</a>
+                            <a class="button button-small button-danger-quiet" href="{% url 'category_delete' category.pk %}">Delete</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4"><div class="empty-state"><span class="empty-icon">◇</span><strong>No categories yet</strong><p>Create a category to organize your products.</p><a class="button button-primary" href="{% url 'category_add' %}">Add your first category</a></div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

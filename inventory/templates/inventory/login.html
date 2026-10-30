@@ -1,24 +1,27 @@
 {% extends 'inventory/base.html' %}
-{% block title %}Login{% endblock %}
+{% block title %}Log in | Inventory{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-center">
-    <div class="card p-4" style="width: 350px;">
-        <h3 class="mb-3 text-center">Inventory Login</h3>
-        <form method="post">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label>Username</label>
-                {{ form.username }}
-            </div>
-            <div class="mb-3">
-                <label>Password</label>
-                {{ form.password }}
-            </div>
-            {% if form.errors %}
-                <p class="text-danger">Invalid username or password.</p>
-            {% endif %}
-            <button type="submit" class="btn btn-primary w-100">Login</button>
-        </form>
-    </div>
-</div>
+<section class="auth-card">
+    <span class="auth-kicker">Welcome back</span>
+    <h1>Sign in to your workspace</h1>
+    <p class="auth-intro">Enter your details to continue managing your inventory.</p>
+    <form method="post" class="styled-form auth-form">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+        {% if form.non_field_errors %}<div class="form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+        <div class="form-field{% if form.username.errors %} has-error{% endif %}">
+            <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+            {{ form.username }}
+            {% if form.username.errors %}<div class="field-errors">{{ form.username.errors }}</div>{% endif %}
+        </div>
+        <div class="form-field{% if form.password.errors %} has-error{% endif %}">
+            <label for="{{ form.password.id_for_label }}">Password</label>
+            {{ form.password }}
+            {% if form.password.errors %}<div class="field-errors">{{ form.password.errors }}</div>{% endif %}
+        </div>
+        <div class="auth-forgot"><a href="{% url 'password_reset' %}">Forgot password?</a></div>
+        <button type="submit" class="button button-primary button-full">Sign in</button>
+    </form>
+    <p class="auth-footnote">New to Stockroom? <a href="{% url 'signup' %}">Create an account</a></p>
+</section>
 {% endblock %}

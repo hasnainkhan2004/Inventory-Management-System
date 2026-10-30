@@ -1,13 +1,16 @@
 {% extends 'inventory/base.html' %}
 {% block title %}Delete Product{% endblock %}
 {% block content %}
-<div class="card p-4" style="max-width: 500px;">
-    <h3 class="mb-3 text-danger">Delete Product?</h3>
-    <p>Are you sure you want to delete <strong>{{ product.name }}</strong>? This cannot be undone.</p>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Yes, Delete</button>
-        <a href="{% url 'product_list' %}" class="btn btn-secondary">Cancel</a>
-    </form>
+<div class="modal-backdrop">
+    <section class="confirmation-modal" role="alertdialog" aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-description">
+        <span class="modal-warning-icon">!</span>
+        <h1 id="delete-title">Delete this product?</h1>
+        <p id="delete-description">You’re about to permanently delete <strong>{{ product.name }}</strong>. This action can’t be undone.</p>
+        <form method="post" class="modal-actions">
+            {% csrf_token %}
+            <a class="button button-secondary" href="{% url 'product_list' %}">Keep product</a>
+            <button type="submit" class="button button-danger">Yes, delete</button>
+        </form>
+    </section>
 </div>
 {% endblock %}

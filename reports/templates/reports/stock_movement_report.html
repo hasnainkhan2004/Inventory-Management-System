@@ -1,0 +1,41 @@
+{% extends 'inventory/base.html' %}
+{% load report_formatting %}
+{% block title %}Stock Movement Report{% endblock %}
+{% block extra_head %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js" defer></script>{% endblock %}
+{% block content %}
+<div class="page-header report-page-header"><div><p class="eyebrow">Reports</p><h1>Stock Movement Report</h1><p class="page-subtitle">Movement activity for the selected date range.</p></div><a class="button button-secondary" href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&amp;{% endif %}export=csv">Export CSV</a></div>
+<form method="get" class="panel report-filter-form">
+    <div class="quick-date-links">
+        {% for period, dates in quick_periods.items %}<a href="?start_date={{ dates.0|date:'Y-m-d' }}&amp;end_date={{ dates.1|date:'Y-m-d' }}{% if filters.product_filter %}&amp;product={{ filters.product_filter }}{% endif %}{% if filters.category_filter %}&amp;category={{ filters.category_filter }}{% endif %}{% if filters.movement_type_filter %}&amp;movement_type={{ filters.movement_type_filter }}{% endif %}{% if filters.reason_filter %}&amp;reason={{ filters.reason_filter }}{% endif %}{% if filters.user_filter %}&amp;user={{ filters.user_filter }}{% endif %}">{% if period == '7_days' %}7 days{% elif period == '30_days' %}30 days{% elif period == 'this_month' %}This month{% else %}Today{% endif %}</a>{% endfor %}
+    </div>
+    <div class="report-filter-fields movement-report-filters">
+        <label>From<input class="form-control" type="date" name="start_date" value="{{ filters.start_date }}"></label><label>To<input class="form-control" type="date" name="end_date" value="{{ filters.end_date }}"></label>
+        <label>Product<select class="form-control" name="product"><option value="">All products</option>{% for product in products %}<option value="{{ product.pk }}"{% if filters.product_filter == product.pk|stringformat:'s' %} selected{% endif %}>{{ product.name }}</option>{% endfor %}</select></label>
+        <label>Category<select class="form-control" name="category"><option value="">All categories</option>{% for category in categories %}<option value="{{ category.pk }}"{% if filters.category_filter == category.pk|stringformat:'s' %} selected{% endif %}>{{ category.name }}</option>{% endfor %}</select></label>
+        <label>Type<select class="form-control" name="movement_type"><option value="">All types</option>{% for value, label in movement_types %}<option value="{{ value }}"{% if filters.movement_type_filter == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+        <label>Reason<select class="form-control" name="reason"><option value="">All reasons</option>{% for value, label in reasons %}<option value="{{ value }}"{% if filters.reason_filter == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+        <label>User<select class="form-control" name="user"><option value="">All users</option>{% for user_option in users %}<option value="{{ user_option.pk }}"{% if filters.user_filter == user_option.pk|stringformat:'s' %} selected{% endif %}>{{ user_option.get_username }}</option>{% endfor %}</select></label>
+    </div>
+    <div class="report-filter-actions"><button class="button button-primary" type="submit">Apply filters</button><a class="button button-secondary" href="{% url 'reports:stock_movement_report' %}">Last 30 days</a></div>
+    {% if filters.date_error %}<p class="report-validation-message" role="alert">{{ filters.date_error }}</p>{% endif %}
+</form>
+<section class="stats-grid report-stats">
+    {% include 'inventory/partials/stat_card.html' with label='IN units' value=totals.total_in detail='Received in selected range' icon='products' trend='In' trend_tone='neutral' %}
+    {% include 'inventory/partials/stat_card.html' with label='OUT units' value=totals.total_out detail='Issued in selected range' icon='warning' trend='Out' trend_tone='warning' %}
+    {% include 'inventory/partials/stat_card.html' with label='Net change' value=totals.net_change detail='Includes adjustments' icon='value' trend='Net' trend_tone='neutral' %}
+    {% include 'inventory/partials/stat_card.html' with label='Movements' value=totals.movement_count detail='Matching ledger entries' icon='products' trend='Entries' trend_tone='neutral' %}
+</section>
+<article class="panel report-chart-panel"><div class="panel-heading"><div><h2>Daily stock movement</h2><p>IN and OUT quantities per day</p></div></div>{% if chart_data %}<div class="report-chart-wrap"><canvas id="movement-daily-chart" role="img" aria-label="Daily IN and OUT movement chart"></canvas></div>{% else %}<div class="chart-empty">No daily movement data for this date range.</div>{% endif %}</article>
+<section class="panel product-panel report-table-panel"><div class="report-table-heading"><div><h2>Top 5 products by OUT quantity</h2><span>Selected date range and filters</span></div></div>
+    <div class="table-scroll"><table class="data-table"><thead><tr><th>Product</th><th>SKU</th><th>OUT quantity</th></tr></thead><tbody>
+        {% for product in top_products %}<tr><td><a class="table-primary" href="{% url 'product_detail' product.product_id %}">{{ product.product__name }}</a></td><td>{{ product.product__sku }}</td><td>{{ product.quantity_out }}</td></tr>{% empty %}<tr><td colspan="3"><div class="empty-state"><strong>No stock out entries</strong><p>No products were issued during the selected range.</p></div></td></tr>{% endfor %}
+    </tbody></table></div>
+</section>
+<section class="panel product-panel report-table-panel"><div class="report-table-heading"><div><h2>Movement details</h2><span>{{ page_obj.paginator.count }} movements</span></div></div>
+    <div class="table-scroll"><table class="data-table"><thead><tr><th>Date</th><th>Product</th><th>Type</th><th>Change</th><th>Before → After</th><th>Reason</th><th>User</th></tr></thead><tbody>
+        {% for movement in movements %}<tr><td>{{ movement.created_at|date:'Y-m-d H:i' }}</td><td><a class="table-primary" href="{% url 'product_detail' movement.product_id %}">{{ movement.product.name }}</a></td><td><span class="movement-pill movement-{{ movement.movement_type|lower }}">{{ movement.get_movement_type_display }}</span></td><td class="{% if movement.quantity_change > 0 %}movement-positive{% else %}movement-negative{% endif %}">{% if movement.quantity_change > 0 %}+{% endif %}{{ movement.quantity_change }}</td><td>{{ movement.quantity_before }} → {{ movement.quantity_after }}</td><td>{{ movement.reason }}</td><td>{{ movement.created_by.get_username }}</td></tr>{% empty %}<tr><td colspan="7"><div class="empty-state"><strong>No movements match this range</strong><p>Adjust the date range or filters to see movement data.</p></div></td></tr>{% endfor %}
+    </tbody></table></div>
+    {% include 'reports/partials/pagination.html' %}
+</section>
+{{ chart_data|json_script:"movement-daily-data" }}
+{% endblock %}

@@ -1,0 +1,13 @@
+<div class="page-header">
+    <div>
+        {% if eyebrow %}<p class="eyebrow">{{ eyebrow }}</p>{% endif %}
+        <h1>{{ title }}</h1>
+        {% if subtitle %}<p class="page-subtitle">{{ subtitle }}</p>{% endif %}
+    </div>
+    {% if action_url and action_label %}
+        <a class="button button-primary" href="{{ action_url }}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14m-7-7h14"/></svg>
+            {{ action_label }}
+        </a>
+    {% endif %}
+</div>

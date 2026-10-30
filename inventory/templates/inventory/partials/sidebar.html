@@ -1,0 +1,55 @@
+<aside class="sidebar" id="app-sidebar">
+    <a class="brand" href="{% url 'dashboard' %}">
+        <span class="brand-mark">S</span>
+        <span class="brand-copy"><strong>Stockroom</strong><small>Inventory suite</small></span>
+    </a>
+    <div class="workspace-switcher">
+        <span class="workspace-icon">N</span>
+        <span><strong>Northstar Co.</strong><small>Workspace</small></span>
+        <svg class="workspace-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+    </div>
+    <p class="sidebar-section-label">Workspace</p>
+    <nav class="sidebar-nav" aria-label="Main navigation">
+        <a class="sidebar-link{% if request.resolver_match.url_name == 'dashboard' %} is-active{% endif %}" href="{% url 'dashboard' %}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="5" rx="2"/><rect x="13" y="10" width="8" height="11" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/></svg>
+            <span>Dashboard</span>
+        </a>
+        <a class="sidebar-link{% if request.resolver_match.url_name == 'product_list' or request.resolver_match.url_name == 'product_add' or request.resolver_match.url_name == 'product_edit' or request.resolver_match.url_name == 'product_delete' or request.resolver_match.url_name == 'product_detail' %} is-active{% endif %}" href="{% url 'product_list' %}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5"/></svg>
+            <span>Products</span>
+        </a>
+        <a class="sidebar-link{% if request.resolver_match.url_name == 'category_list' or request.resolver_match.url_name == 'category_add' or request.resolver_match.url_name == 'category_edit' or request.resolver_match.url_name == 'category_delete' %} is-active{% endif %}" href="{% url 'category_list' %}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13 13 20a2 2 0 0 1-3 0l-6-6a2 2 0 0 1 0-3l7-7h7a2 2 0 0 1 2 2v7Z"/><circle cx="16" cy="8" r="1"/></svg>
+            <span>Categories</span>
+        </a>
+        <a class="sidebar-link{% if request.resolver_match.url_name == 'supplier_list' or request.resolver_match.url_name == 'supplier_add' or request.resolver_match.url_name == 'supplier_detail' or request.resolver_match.url_name == 'supplier_edit' or request.resolver_match.url_name == 'supplier_delete' %} is-active{% endif %}" href="{% url 'supplier_list' %}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 10h.01M15 10h.01M9 14h.01M15 14h.01M10 21v-3h4v3"/></svg>
+            <span>Suppliers</span>
+        </a>
+        <a class="sidebar-link{% if request.resolver_match.url_name == 'stock_movement_list' or request.resolver_match.url_name == 'stock_in' or request.resolver_match.url_name == 'stock_out' or request.resolver_match.url_name == 'stock_adjust' %} is-active{% endif %}" href="{% url 'stock_movement_list' %}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h13l-3-3m3 3-3 3M17 17H4l3 3m-3-3 3-3"/></svg>
+            <span>Stock Movements</span>
+        </a>
+        <a class="sidebar-link{% if request.resolver_match.namespace == 'reports' %} is-active{% endif %}" href="{% url 'reports:hub' %}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5m0 14h17"/><path d="m7 15 4-4 3 2 5-6"/></svg>
+            <span>Reports</span>
+        </a>
+    </nav>
+    <p class="sidebar-section-label sidebar-section-lower">Preferences</p>
+    <button class="sidebar-link sidebar-settings" type="button" data-theme-toggle>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-1.5.9l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.5-.9l-1.7.7-1.4-2.4 1.4-1.1a7 7 0 0 1 0-1.8l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 1.5-.9l.3-1.8h2.8l.3 1.8a8 8 0 0 1 1.5.9l1.7-.7 1.4 2.4-1.4 1.1a7 7 0 0 1 0 1.7Z"/></svg>
+        <span>Settings</span>
+        <small class="soon-label">Theme</small>
+    </button>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-help">
+        <span class="help-icon">?</span>
+        <span><strong>Need a hand?</strong><small>Visit the help center</small></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg>
+    </div>
+    <div class="sidebar-footer">
+        <span class="online-dot"></span>
+        <span>All systems operational</span>
+    </div>
+</aside>
+<button class="sidebar-scrim" type="button" aria-label="Close navigation" data-sidebar-scrim hidden></button>

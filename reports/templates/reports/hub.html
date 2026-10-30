@@ -1,0 +1,31 @@
+{% extends 'inventory/base.html' %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+{% include 'inventory/partials/page_header.html' with eyebrow='Insights' title='Reports' subtitle='Explore inventory value, movement trends, stock risk, and supplier performance.' %}
+<section class="report-card-grid">
+    <a class="panel report-hub-card" href="{% url 'reports:stock_valuation' %}">
+        <span class="report-card-icon report-icon-value">Rs</span>
+        <h2>Stock Valuation</h2>
+        <p>Review inventory cost, retail value, and potential profit.</p>
+        <span class="report-card-link">Open report <span aria-hidden="true">→</span></span>
+    </a>
+    <a class="panel report-hub-card" href="{% url 'reports:stock_movement_report' %}">
+        <span class="report-card-icon report-icon-movement">↔</span>
+        <h2>Stock Movement Report</h2>
+        <p>Analyze stock receipts, outflows, and adjustments over time.</p>
+        <span class="report-card-link">Open report <span aria-hidden="true">→</span></span>
+    </a>
+    <a class="panel report-hub-card" href="{% url 'reports:low_stock_report' %}">
+        <span class="report-card-icon report-icon-warning">!</span>
+        <h2>Low Stock Report</h2>
+        <p>Find active products that need replenishment soon.</p>
+        <span class="report-card-link">Open report <span aria-hidden="true">→</span></span>
+    </a>
+    <a class="panel report-hub-card" href="{% url 'reports:supplier_stock_report' %}">
+        <span class="report-card-icon report-icon-supplier">▤</span>
+        <h2>Supplier-wise Stock</h2>
+        <p>Compare supplier product counts, units, value, and low stock.</p>
+        <span class="report-card-link">Open report <span aria-hidden="true">→</span></span>
+    </a>
+</section>
+{% endblock %}

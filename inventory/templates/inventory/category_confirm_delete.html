@@ -1,0 +1,16 @@
+{% extends 'inventory/base.html' %}
+{% block title %}Delete category{% endblock %}
+{% block content %}
+<div class="modal-backdrop">
+    <section class="confirmation-modal" role="alertdialog" aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-description">
+        <span class="modal-warning-icon">!</span>
+        <h1 id="delete-title">Delete this category?</h1>
+        <p id="delete-description">You’re about to delete <strong>{{ category.name }}</strong>. Products must be reassigned before this category can be deleted.</p>
+        <form method="post" class="modal-actions">
+            {% csrf_token %}
+            <a class="button button-secondary" href="{% url 'category_list' %}">Cancel</a>
+            <button type="submit" class="button button-danger">Delete category</button>
+        </form>
+    </section>
+</div>
+{% endblock %}

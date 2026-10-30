@@ -1,0 +1,23 @@
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Django and local data
+db.sqlite3
+*.sqlite3
+media/
+staticfiles/
+
+# Environment and secrets
+.env
+
+# Editors
+.vscode/
+.idea/
+
+# Logs and Windows
+*.log
+Thumbs.db
+Desktop.ini

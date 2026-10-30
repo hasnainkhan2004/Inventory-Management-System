@@ -1,0 +1,29 @@
+{% extends 'inventory/base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+{% include 'inventory/partials/page_header.html' with eyebrow='Partners' title=title subtitle='Keep supplier contact and payment details up to date.' %}
+<section class="panel form-panel">
+    <form method="post" class="styled-form">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+        <div class="form-grid">
+            {% for field in form.visible_fields %}
+                <div class="form-field{% if field.errors %} has-error{% endif %}">
+                    {% if field.name == 'is_active' %}
+                        <label class="checkbox-control" for="{{ field.id_for_label }}">{{ field }}<span>{{ field.label }}</span></label>
+                    {% else %}
+                        {{ field.label_tag }}
+                        {{ field }}
+                    {% endif %}
+                    {% if field.help_text %}<small class="field-help">{{ field.help_text|safe }}</small>{% endif %}
+                    {% if field.errors %}<div class="field-errors">{{ field.errors }}</div>{% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="form-actions">
+            <a class="button button-secondary" href="{% if supplier %}{% url 'supplier_detail' supplier.pk %}{% else %}{% url 'supplier_list' %}{% endif %}">Cancel</a>
+            <button type="submit" class="button button-primary">Save supplier</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

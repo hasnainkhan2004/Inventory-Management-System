@@ -1,0 +1,59 @@
+{% extends 'inventory/base.html' %}
+{% block title %}{{ supplier.name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Supplier</p>
+        <h1>{{ supplier.name }}</h1>
+        <p class="page-subtitle">{{ supplier.contact_person|default:'Supplier contact' }} · {{ supplier.payment_terms }}</p>
+    </div>
+    <div class="header-actions">
+        <a class="button button-secondary" href="{% url 'supplier_edit' supplier.pk %}">Edit supplier</a>
+        {% if user.is_staff %}<a class="button button-danger-quiet" href="{% url 'supplier_delete' supplier.pk %}">Delete supplier</a>{% endif %}
+    </div>
+</div>
+<section class="supplier-detail-grid">
+    <article class="panel supplier-overview">
+        <div class="supplier-detail-status">
+            {% if supplier.is_active %}{% include 'inventory/partials/status_badge.html' with label='Active' tone='success' %}{% else %}{% include 'inventory/partials/status_badge.html' with label='Inactive' tone='neutral' %}{% endif %}
+            <span class="chart-period">{{ product_count }} products</span>
+        </div>
+        <dl class="product-facts supplier-facts">
+            <div><dt>Contact person</dt><dd>{{ supplier.contact_person|default:'—' }}</dd></div>
+            <div><dt>Phone</dt><dd>{{ supplier.phone|default:'—' }}</dd></div>
+            <div><dt>Email</dt><dd>{% if supplier.email %}<a href="mailto:{{ supplier.email }}">{{ supplier.email }}</a>{% else %}—{% endif %}</dd></div>
+            <div><dt>City</dt><dd>{{ supplier.city|default:'—' }}</dd></div>
+            <div><dt>Payment terms</dt><dd>{{ supplier.payment_terms }}</dd></div>
+            <div><dt>Address</dt><dd>{{ supplier.address|linebreaksbr|default:'—' }}</dd></div>
+        </dl>
+        {% if supplier.notes %}<p class="product-description">{{ supplier.notes }}</p>{% endif %}
+        <div class="supplier-stock-value">
+            <span>Total stock value</span>
+            <strong>Rs {{ stock_value }}</strong>
+        </div>
+    </article>
+    <article class="panel inventory-panel supplier-products">
+        <div class="panel-heading inventory-heading">
+            <div><h2>Products</h2><p>Products provided by {{ supplier.name }}</p></div>
+            <a class="text-link" href="{% url 'product_list' %}?supplier={{ supplier.pk }}">View in catalog <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr><th>Product</th><th>SKU</th><th>Quantity</th><th>Stock status</th></tr></thead>
+                <tbody>
+                    {% for product in products %}
+                        <tr>
+                            <td><a class="table-primary" href="{% url 'product_detail' product.pk %}">{{ product.name }}</a></td>
+                            <td><span class="table-mono">{{ product.sku }}</span></td>
+                            <td>{{ product.quantity }} {{ product.unit.short_code|default:'units' }}</td>
+                            <td>{% if product.is_low_stock %}{% include 'inventory/partials/status_badge.html' with label='Low stock' tone='warning' %}{% else %}{% include 'inventory/partials/status_badge.html' with label='In stock' tone='success' %}{% endif %}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4"><div class="empty-state"><strong>No products assigned</strong><p>Assign products to this supplier from their product forms.</p></div></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+</section>
+{% endblock %}

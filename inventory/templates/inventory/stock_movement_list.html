@@ -1,0 +1,71 @@
+{% extends 'inventory/base.html' %}
+{% block title %}Stock Movements{% endblock %}
+{% block content %}
+{% url 'stock_in' as stock_in_url %}
+{% include 'inventory/partials/page_header.html' with eyebrow='Inventory' title='Stock Movements' subtitle='Review every recorded change to product stock.' action_url=stock_in_url action_label='Record stock in' %}
+<section class="panel product-panel">
+    <form method="get" class="table-toolbar movement-toolbar">
+        <div class="table-toolbar-copy">
+            <strong>Movement ledger</strong>
+            <span>{{ page_obj.paginator.count }} movements</span>
+        </div>
+        <div class="table-search">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg>
+            <input type="search" name="q" value="{{ query }}" placeholder="Search movements..." aria-label="Search movements">
+        </div>
+        <select class="filter-select" name="product" aria-label="Filter by product">
+            <option value="">All products</option>
+            {% for product in products %}
+                <option value="{{ product.pk }}"{% if product_filter == product.pk|stringformat:'s' %} selected{% endif %}>{{ product.name }}</option>
+            {% endfor %}
+        </select>
+        <select class="filter-select" name="type" aria-label="Filter by movement type">
+            <option value="">All types</option>
+            {% for value, label in movement_types %}
+                <option value="{{ value }}"{% if type_filter == value %} selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select class="filter-select" name="user" aria-label="Filter by user">
+            <option value="">All users</option>
+            {% for user_option in users %}
+                <option value="{{ user_option.pk }}"{% if user_filter == user_option.pk|stringformat:'s' %} selected{% endif %}>{{ user_option.get_username }}</option>
+            {% endfor %}
+        </select>
+        <label class="date-filter">From <input class="filter-select" type="date" name="start_date" value="{{ start_date }}"></label>
+        <label class="date-filter">To <input class="filter-select" type="date" name="end_date" value="{{ end_date }}"></label>
+        <button class="button button-secondary" type="submit">Apply filters</button>
+        {% if query or product_filter or type_filter or user_filter or start_date or end_date %}<a class="clear-search" href="{% url 'stock_movement_list' %}">Clear</a>{% endif %}
+    </form>
+    <div class="table-scroll">
+        <table class="data-table">
+            <thead>
+                <tr><th>Date</th><th>Product</th><th>Type</th><th>Change</th><th>Before → After</th><th>Reason</th><th>User</th></tr>
+            </thead>
+            <tbody>
+                {% for movement in movements %}
+                    <tr>
+                        <td>{{ movement.created_at|date:'M j, Y H:i' }}</td>
+                        <td><a class="table-primary" href="{% url 'product_detail' movement.product_id %}">{{ movement.product.name }}</a></td>
+                        <td><span class="movement-pill movement-{{ movement.movement_type|lower }}">{{ movement.get_movement_type_display }}</span></td>
+                        <td class="{% if movement.quantity_change > 0 %}movement-positive{% else %}movement-negative{% endif %}">{% if movement.quantity_change > 0 %}+{% endif %}{{ movement.quantity_change }}</td>
+                        <td>{{ movement.quantity_before }} → {{ movement.quantity_after }}</td>
+                        <td>{{ movement.reason }}</td>
+                        <td>{{ movement.created_by.get_username }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="7"><div class="empty-state"><span class="empty-icon">↔</span><strong>{% if query or product_filter or type_filter or user_filter or start_date or end_date %}No matching movements{% else %}No movements recorded yet{% endif %}</strong><p>{% if query or product_filter or type_filter or user_filter or start_date or end_date %}Try changing or clearing the filters.{% else %}Record stock in, stock out, or an adjustment to start the ledger.{% endif %}</p>{% if not query and not product_filter and not type_filter and not user_filter and not start_date and not end_date %}<a class="button button-primary" href="{% url 'stock_in' %}">Record stock in</a>{% endif %}</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if page_obj.paginator.num_pages > 1 %}
+        <nav class="pagination-bar" aria-label="Stock movement pages">
+            <span>Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            <div class="pagination-controls">
+                {% if page_obj.has_previous %}<a class="button button-secondary button-small" href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>{% else %}<span class="button button-secondary button-small is-disabled">Previous</span>{% endif %}
+                {% if page_obj.has_next %}<a class="button button-secondary button-small" href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}">Next</a>{% else %}<span class="button button-secondary button-small is-disabled">Next</span>{% endif %}
+            </div>
+        </nav>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'inventory/base.html' %}
+{% block title %}Low Stock Report{% endblock %}
+{% block content %}
+<div class="page-header report-page-header"><div><p class="eyebrow">Reports</p><h1>Low Stock Report</h1><p class="page-subtitle">Active products at or below their reorder threshold.</p></div><a class="button button-secondary" href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&amp;{% endif %}export=csv">Export CSV</a></div>
+<form method="get" class="panel report-filter-form">
+    <div class="report-filter-fields">
+        <label>Category<select class="form-control" name="category"><option value="">All categories</option>{% for category in categories %}<option value="{{ category.pk }}"{% if filters.category_filter == category.pk|stringformat:'s' %} selected{% endif %}>{{ category.name }}</option>{% endfor %}</select></label>
+        <label>Supplier<select class="form-control" name="supplier"><option value="">All suppliers</option>{% for supplier in suppliers %}<option value="{{ supplier.pk }}"{% if filters.supplier_filter == supplier.pk|stringformat:'s' %} selected{% endif %}>{{ supplier.name }}</option>{% endfor %}</select></label>
+    </div>
+    <div class="report-filter-actions"><button class="button button-primary" type="submit">Apply filters</button><a class="button button-secondary" href="{% url 'reports:low_stock_report' %}">Clear</a><button class="button button-secondary" type="button" onclick="window.print()">Print</button></div>
+</form>
+<section class="stats-grid report-stats">
+    {% include 'inventory/partials/stat_card.html' with label='Products to reorder' value=totals.product_count detail='Active products at threshold' icon='products' trend='Review' trend_tone='warning' %}
+    {% include 'inventory/partials/stat_card.html' with label='Out of stock' value=totals.out_of_stock_count detail='No units available' icon='warning' trend='Urgent' trend_tone='warning' %}
+    {% include 'inventory/partials/stat_card.html' with label='Suggested reorder units' value=totals.suggested_reorder_total detail='Across filtered products' icon='value' trend='Replenish' trend_tone='neutral' %}
+</section>
+<section class="panel product-panel report-table-panel">
+    <div class="report-table-heading"><div><h2>Products to reorder</h2><span>{{ page_obj.paginator.count }} products · most urgent first</span></div></div>
+    <div class="table-scroll"><table class="data-table"><thead><tr><th>Product</th><th>SKU</th><th>Supplier</th><th>Current qty</th><th>Threshold</th><th>Suggested reorder</th><th>Status</th></tr></thead><tbody>
+        {% for product in products %}<tr><td><a class="table-primary" href="{% url 'product_detail' product.pk %}">{{ product.name }}</a></td><td>{{ product.sku }}</td><td>{% if product.supplier %}<a href="{% url 'supplier_detail' product.supplier_id %}">{{ product.supplier.name }}</a>{% if product.supplier.phone %}<small class="report-phone">{{ product.supplier.phone }}</small>{% endif %}{% else %}—{% endif %}</td><td>{{ product.quantity }}</td><td>{{ product.low_stock_threshold }}</td><td>{{ product.suggested_reorder }}</td><td>{% if product.quantity == 0 %}{% include 'inventory/partials/status_badge.html' with label='Out of stock' tone='danger' %}{% else %}{% include 'inventory/partials/status_badge.html' with label='Low' tone='warning' %}{% endif %}</td></tr>{% empty %}<tr><td colspan="7"><div class="empty-state"><span class="empty-icon">✓</span><strong>No low stock products</strong><p>Active products are above their thresholds for these filters.</p></div></td></tr>{% endfor %}
+    </tbody></table></div>
+    {% include 'reports/partials/pagination.html' %}
+</section>
+{% endblock %}
