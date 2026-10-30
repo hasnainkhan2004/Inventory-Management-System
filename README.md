@@ -1,5 +1,5 @@
 # Inventory Management System - Stockroom
-A Django inventory management system for products, stock movements, suppliers, and reports.
+A inventory management system for products, stock movements, suppliers, and reports.
 
 ## Overview
 Stockroom is an inventory management system for teams that need to maintain a shared product catalog and monitor stock. Authenticated users can manage products, categories, suppliers, stock movements, and operational reports.
