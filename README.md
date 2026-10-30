@@ -5,97 +5,52 @@ A Django inventory management system for products, stock movements, suppliers, a
 Stockroom is an inventory management system for teams that need to maintain a shared product catalog and monitor stock. Authenticated users can manage products, categories, suppliers, stock movements, and operational reports.
 
 ## Screenshots
-![Dashboard](docs/screenshots/dashboard1.png)
+### Dashboard
 
-Dashboard overview.
+| Dashboard overview | Dashboard stock summary |
+|---|---|
+| [![Dashboard overview](docs/screenshots/dashboard1.png)](docs/screenshots/dashboard1.png) | [![Dashboard stock summary](docs/screenshots/dashboard%202.png)](docs/screenshots/dashboard%202.png) |
 
-![Dashboard stock summary](docs/screenshots/dashboard%202.png)
+### Products
 
-Dashboard stock summary.
+| Product catalog | Add product | Edit product |
+|---|---|---|
+| [![Product catalog](docs/screenshots/products.png)](docs/screenshots/products.png) | [![Add product](docs/screenshots/addproduct.png)](docs/screenshots/addproduct.png) | [![Edit product](docs/screenshots/editproduct.png)](docs/screenshots/editproduct.png) |
 
-![Products](docs/screenshots/products.png)
+### Categories
 
-Product catalog.
+| Category list | Add category | Edit category |
+|---|---|---|
+| [![Category list](docs/screenshots/categories.png)](docs/screenshots/categories.png) | [![Add category](docs/screenshots/addcategory.png)](docs/screenshots/addcategory.png) | [![Edit category](docs/screenshots/editcategory.png)](docs/screenshots/editcategory.png) |
 
-![Add product](docs/screenshots/addproduct.png)
+### Stock movements
 
-Product creation form.
+| Movement history | Stock in | Stock out | Adjust stock |
+|---|---|---|---|
+| [![Stock movement history](docs/screenshots/stockmovements.png)](docs/screenshots/stockmovements.png) | [![Stock in](docs/screenshots/stockin.png)](docs/screenshots/stockin.png) | [![Stock out](docs/screenshots/stockout.png)](docs/screenshots/stockout.png) | [![Adjust stock](docs/screenshots/adjuststock.png)](docs/screenshots/adjuststock.png) |
 
-![Edit product](docs/screenshots/editproduct.png)
+### Suppliers
 
-Product editing form.
+| Supplier list | Add supplier | Edit supplier | Supplier details |
+|---|---|---|---|
+| [![Supplier list](docs/screenshots/suppliers.png)](docs/screenshots/suppliers.png) | [![Add supplier](docs/screenshots/addsupplier.png)](docs/screenshots/addsupplier.png) | [![Edit supplier](docs/screenshots/editsupplier.png)](docs/screenshots/editsupplier.png) | [![Supplier details](docs/screenshots/supplierdetail.png)](docs/screenshots/supplierdetail.png) |
 
-![Categories](docs/screenshots/categories.png)
+### Reports
 
-Category list.
+| Reports overview | Low-stock report | Stock movement report | Stock valuation |
+|---|---|---|---|
+| [![Reports overview](docs/screenshots/reports.png)](docs/screenshots/reports.png) | [![Low-stock report](docs/screenshots/lowstockreport.png)](docs/screenshots/lowstockreport.png) | [![Stock movement report](docs/screenshots/stock%20movementreport.png)](docs/screenshots/stock%20movementreport.png) | [![Stock valuation](docs/screenshots/stockvaluation.png)](docs/screenshots/stockvaluation.png) |
 
-![Add category](docs/screenshots/addcategory.png)
+| Supplier stock report |
+|---|
+| [![Supplier stock report](docs/screenshots/supplierwisestock.png)](docs/screenshots/supplierwisestock.png) |
 
-Category creation form.
+### Accounts
 
-![Edit category](docs/screenshots/editcategory.png)
+| Sign in | Sign up |
+|---|---|
+| [![Sign in](docs/screenshots/signin.png)](docs/screenshots/signin.png) | [![Sign up](docs/screenshots/signup.png)](docs/screenshots/signup.png) |
 
-Category editing form.
-
-![Suppliers](docs/screenshots/suppliers.png)
-
-Supplier list.
-
-![Add supplier](docs/screenshots/addsupplier.png)
-
-Supplier creation form.
-
-![Edit supplier](docs/screenshots/editsupplier.png)
-
-Supplier editing form.
-
-![Supplier details](docs/screenshots/supplierdetail.png)
-
-Supplier details.
-
-![Stock movements](docs/screenshots/stockmovements.png)
-
-Stock movement history.
-
-![Stock in](docs/screenshots/stockin.png)
-
-Stock-in form.
-
-![Stock out](docs/screenshots/stockout.png)
-
-Stock-out form.
-
-![Adjust stock](docs/screenshots/adjuststock.png)
-
-Stock adjustment form.
-
-![Reports](docs/screenshots/reports.png)
-
-Reports overview.
-
-![Low-stock report](docs/screenshots/lowstockreport.png)
-
-Low-stock report.
-
-![Stock movement report](docs/screenshots/stock%20movementreport.png)
-
-Stock movement report.
-
-![Stock valuation](docs/screenshots/stockvaluation.png)
-
-Stock valuation report.
-
-![Supplier stock report](docs/screenshots/supplierwisestock.png)
-
-Supplier-wise stock report.
-
-![Sign in](docs/screenshots/signin.png)
-
-Sign-in page.
-
-![Sign up](docs/screenshots/signup.png)
-
-Sign-up page.
 
 ## Features
 ### Dashboard
